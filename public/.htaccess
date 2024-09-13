@@ -1,0 +1,9 @@
+# 启用重写引擎（如果需要的话）
+RewriteEngine On
+
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# 对于其他请求，保持原有的重写规则
+RewriteRule ^ index.php [QSA,L]

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Access iPhone Camera</title>
+    <style>
+        /* Ensure the video takes the correct size */
+        video {
+            width: 100%;
+            height: auto;
+            max-width: 400px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan QR Code</h1>
+    <video id="video" autoplay playsinline></video> <!-- Add playsinline to ensure mobile compatibility -->
+    <script>
+        // Check if the browser supports getUserMedia
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: "environment" } // Request the back camera
+                }
+            }).then(function (stream) {
+                const video = document.getElementById('video');
+                // Attach the video stream to the video element
+                video.srcObject = stream;
+                video.play();
+            }).catch(function (error) {
+                console.error("Error accessing camera: ", error);
+                alert("Error accessing camera: " + error.message);
+            });
+        } else {
+            alert("getUserMedia not supported on your browser!");
+        }
+    </script>
+</body>
+</html>

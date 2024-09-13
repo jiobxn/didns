@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Scanner</title>
+    <style>
+        video {
+            width: 100%;
+            height: auto;
+            max-width: 400px;
+            border: 1px solid black;
+        }
+        canvas {
+            display: none; /* Hide the canvas element */
+        }
+    </style>
+</head>
+<body>
+    <h1>Scan QR Code</h1>
+    <video id="video" autoplay playsinline></video>
+    <canvas id="canvas" width="400" height="300"></canvas> <!-- Canvas to capture video frame -->
+    <p id="qr-result">QR Code: <span id="result"></span></p>
+
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const resultElement = document.getElementById('result');
+
+        // Start video stream
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: "environment" } // Use the back camera
+                }
+            }).then(function(stream) {
+                video.srcObject = stream;
+                video.play();
+                requestAnimationFrame(scanQRCode); // Start scanning after video plays
+            }).catch(function(error) {
+                console.error("Error accessing camera: ", error);
+                alert("Error accessing camera: " + error.message);
+            });
+        } else {
+            alert("getUserMedia not supported on your browser!");
+        }
+
+        // Function to scan QR code
+        function scanQRCode() {
+            // Draw the video frame to the canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Get image data from the canvas
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // Use jsQR to detect the QR code
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                // QR code found, display result
+                resultElement.textContent = code.data;
+                console.log("QR Code found: ", code.data);
+            } else {
+                // If no QR code found, keep scanning
+                requestAnimationFrame(scanQRCode);
+            }
+        }
+    </script>
+</body>
+</html>
